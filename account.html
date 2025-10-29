@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - LynxFace</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!-- Added Inter font for consistent typography across all pages -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Enhanced modern professional design matching site aesthetic */
+        .account-page {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #fef3c7 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem 1.5rem; /* Reduced bottom padding from 2rem to 1.5rem (24px) */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Added animated background pattern */
+        .account-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        body.dark-mode .account-page {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+
+        .account-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Enhanced title with better gradient and animation */
+        .account-container h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+            text-align: center;
+            letter-spacing: -0.03em;
+            animation: titleFadeIn 0.8s ease-out;
+            text-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        @keyframes titleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.25rem;
+            animation: gridFadeIn 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes gridFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Premium glass-morphism card design */
+        .account-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 2rem;
+            padding: 1.75rem;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.06),
+                0 2px 8px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .account-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        /* Animated gradient border on hover */
+        .account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #06b6d4, #6366f1, #8b5cf6, #06b6d4);
+            background-size: 200% 100%;
+            opacity: 0;
+            transition: opacity 0.4s;
+            animation: gradientFlow 3s linear infinite;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .account-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 
+                0 24px 64px rgba(6, 182, 212, 0.15),
+                0 8px 24px rgba(99, 102, 241, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .account-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Modern section headers with icon accent */
+        .account-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--color-text);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            letter-spacing: -0.01em;
+        }
+
+        .account-card h3::before {
+            content: '';
+            width: 5px;
+            height: 28px;
+            background: linear-gradient(180deg, #06b6d4, #6366f1);
+            border-radius: 3px;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+        }
+
+        /* Enhanced profile header with premium styling */
+        .account-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(6, 182, 212, 0.1);
+            position: relative;
+        }
+
+        .account-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, #06b6d4, #6366f1);
+            border-radius: 2px;
+        }
+
+        /* Premium avatar with animated glow effect */
+        .account-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 
+                0 12px 32px rgba(99, 102, 241, 0.35),
+                0 4px 12px rgba(6, 182, 212, 0.25);
+            position: relative;
+            animation: avatarPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes avatarPulse {
+            0%, 100% {
+                box-shadow: 
+                    0 12px 32px rgba(99, 102, 241, 0.35),
+                    0 4px 12px rgba(6, 182, 212, 0.25);
+            }
+            50% {
+                box-shadow: 
+                    0 16px 48px rgba(99, 102, 241, 0.45),
+                    0 8px 20px rgba(6, 182, 212, 0.35);
+            }
+        }
+
+        .account-avatar::after {
+            content: '';
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #6366f1);
+            opacity: 0.2;
+            filter: blur(12px);
+            z-index: -1;
+        }
+
+        .account-avatar svg {
+            color: white;
+            width: 45px;
+            height: 45px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.2));
+        }
+
+        .account-info h2 {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .account-info p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Premium badge with enhanced styling */
+        .subscription-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1));
+            color: var(--color-text);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            letter-spacing: 0.02em;
+        }
+
+        .subscription-badge.premium {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white;
+            border: none;
+            box-shadow: 
+                0 6px 20px rgba(251, 191, 36, 0.4),
+                0 2px 8px rgba(245, 158, 11, 0.3);
+            animation: premiumShine 2s ease-in-out infinite;
+        }
+
+        @keyframes premiumShine {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.1); }
+        }
+
+        /* Modern stats grid with enhanced visual design */
+        .account-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem 0.75rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(99, 102, 241, 0.05));
+            border-radius: 1.25rem;
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-4px) scale(1.05);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(99, 102, 241, 0.1));
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+        }
+
+        .stat-item:hover::before {
+            left: 100%;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #06b6d4, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        /* Enhanced form styling with modern inputs */
+        .account-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: var(--color-text);
+            margin-bottom: 0.625rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem 1.25rem;
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            background-color: rgba(255, 255, 255, 0.5);
+            color: var(--color-text);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+
+        body.dark-mode .form-group input {
+            background-color: rgba(15, 23, 42, 0.5);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #06b6d4;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 
+                0 0 0 4px rgba(6, 182, 212, 0.1),
+                0 4px 16px rgba(6, 182, 212, 0.15);
+            transform: translateY(-2px);
+        }
+
+        body.dark-mode .form-group input:focus {
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        /* Premium button designs with enhanced gradients */
+        .btn-primary {
+            background: linear-gradient(135deg, #06b6d4, #6366f1);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 6px 20px rgba(6, 182, 212, 0.3),
+                0 2px 8px rgba(99, 102, 241, 0.2);
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 
+                0 12px 32px rgba(6, 182, 212, 0.4),
+                0 4px 16px rgba(99, 102, 241, 0.3);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--color-text);
+            padding: 0.875rem 2rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid rgba(6, 182, 212, 0.3);
+            cursor: pointer;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: rgba(30, 41, 59, 0.8);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: #06b6d4;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 6px 20px rgba(239, 68, 68, 0.3),
+                0 2px 8px rgba(220, 38, 38, 0.2);
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 
+                0 12px 32px rgba(239, 68, 68, 0.4),
+                0 4px 16px rgba(220, 38, 38, 0.3);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* Enhanced danger zone with premium styling */
+        .danger-zone {
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+        }
+
+        .danger-zone h3 {
+            color: #ef4444;
+        }
+
+        .danger-zone h3::before {
+            background: linear-gradient(180deg, #ef4444, #dc2626);
+        }
+
+        .danger-zone p {
+            color: var(--color-text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Toast notification styles */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1.25rem 1.75rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .toast.info {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
+        .toast.hiding {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+
+        /* Loading skeleton styles */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 1rem;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        body.dark-mode .skeleton {
+            background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+            background-size: 200% 100%;
+        }
+        
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid transparent;
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modern delete confirmation modal */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .delete-modal.active {
+            display: flex;
+        }
+        
+        .delete-modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        body.dark-mode .delete-modal-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .delete-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .delete-modal-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+        }
+        
+        .delete-modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--color-text);
+            margin: 0;
+        }
+        
+        .delete-modal-body {
+            margin: 1.5rem 0;
+            color: var(--color-text-muted);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+        
+        .delete-modal-warning {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            border-left: 4px solid #ef4444;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            color: #991b1b;
+            font-weight: 600;
+        }
+        
+        body.dark-mode .delete-modal-warning {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+        
+        .delete-modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .delete-modal-actions button {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .delete-modal-cancel {
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 2px solid var(--color-border);
+        }
+        
+        .delete-modal-cancel:hover {
+            background: var(--color-border);
+            transform: translateY(-2px);
+        }
+        
+        .delete-modal-confirm {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+        
+        .delete-modal-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Responsive design improvements */
+        @media (max-width: 768px) {
+            .account-container h1 {
+                font-size: 2rem;
+            }
+
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .account-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .account-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 1.75rem;
+            }
+
+            .account-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Message display styles for forms */
+        .form-message {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .form-message.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .form-message.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        body.dark-mode .form-message.success {
+            color: #6ee7b7;
+        }
+
+        body.dark-mode .form-message.error {
+            color: #fca5a5;
+        }
+
+        /* Added footer integration styles for seamless connection */
+        .footer {
+            margin-top: 0 !important;
+            padding-top: 1.5rem !important;
+            border-top: 1px solid rgba(6, 182, 212, 0.15);
+            background: transparent !important;
+        }
+
+        body.dark-mode .footer {
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Added explicit footer font styling to match other pages */
+        .footer-section h3 {
+            font-size: 1.125rem !important;
+            font-weight: 400 !important; /* Changed from 600 to 400 for normal weight */
+            letter-spacing: normal !important;
+        }
+
+        .footer-section h4 {
+            font-size: 1rem !important;
+            font-weight: 400 !important; /* Changed from 600 to 400 for normal weight */
+            letter-spacing: normal !important;
+        }
+
+        /* Added mobile menu logout button styling to match other pages */
+        .nav-menu.active .mobile-auth-buttons .btn-danger {
+            background-color: transparent !important;
+            background: transparent !important;
+            border: 1px solid var(--color-error) !important;
+            color: var(--color-error) !important;
+            box-shadow: none !important;
+        }
+
+        .nav-menu.active .mobile-auth-buttons .btn-danger:hover {
+            background-color: #fef2f2 !important;
+            background: #fef2f2 !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        body.dark-mode .nav-menu.active .mobile-auth-buttons .btn-danger:hover {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-progress-bar" id="top-progress"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <!-- Made logo and brand name clickable, linking to home page -->
+                <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                    <img src="favicon.png" alt="LynxFace Logo" class="nav-logo">
+                    <span class="nav-brand">LynxFace</span>
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="analyze.html">Analyze</a></li>
+                <li><a href="pricing.html">Pricing</a></li>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <!-- Removed pre-rendered auth buttons to prevent flicker -->
+                <div class="mobile-auth-buttons">
+                </div>
+                <div class="mobile-dark-mode-toggle">
+                    <button id="mobileDarkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </ul>
+            <!-- Removed pre-rendered auth buttons, will be rendered by header-component.js -->
+            <div class="nav-right" id="navRight">
+                <!-- Auth UI will be injected here after auth is ready -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Added loading skeleton for auth state -->
+    <div id="loadingSkeleton" style="display: none; padding: 2rem; max-width: 1200px; margin: 0 auto;">
+        <div class="skeleton" style="height: 40px; width: 200px; margin-bottom: 2rem;"></div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            <div class="skeleton" style="height: 300px;"></div>
+            <div class="skeleton" style="height: 300px;"></div>
+            <div class="skeleton" style="height: 300px;"></div>
+        </div>
+    </div>
+
+    <main class="account-page fade-enter" id="accountContent" style="display: none;">
+        <div class="account-container">
+            <h1>My Account</h1>
+
+            <div class="account-grid">
+                <!-- Enhanced profile card with modern design -->
+                <div class="account-card">
+                    <div class="account-header">
+                        <div class="account-avatar">
+                            <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <div class="account-info">
+                            <h2 id="displayName">Loading...</h2>
+                            <p id="userEmail">Loading...</p>
+                            <span id="subscriptionBadge" class="subscription-badge">Free</span>
+                        </div>
+                    </div>
+
+                    <div class="account-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Total Analyses</span>
+                            <span class="stat-value" id="totalAnalyses">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Today</span>
+                            <span class="stat-value" id="analysesToday">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Credits</span>
+                            <span class="stat-value" id="remainingAnalyses">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modern edit profile card -->
+                <div class="account-card">
+                    <h3>Edit Profile</h3>
+                    <form id="updateProfileForm" class="account-form">
+                        <div class="form-group">
+                            <label for="newDisplayName">Display Name</label>
+                            <input type="text" id="newDisplayName" name="newDisplayName" placeholder="Enter new display name">
+                        </div>
+                        <button type="submit" class="btn-primary" id="updateNameBtn">Update Name</button>
+                    </form>
+                </div>
+
+                <!-- Removed Change Email section completely -->
+
+                <!-- Modern change password card -->
+                <div class="account-card">
+                    <h3>Change Password</h3>
+                    <form id="pw-form" class="account-form" novalidate>
+                        <div class="form-group">
+                            <label for="pw-new">New Password</label>
+                            <input type="password" id="pw-new" name="pw-new" placeholder="Enter new password" minlength="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pw-confirm">Confirm Password</label>
+                            <input type="password" id="pw-confirm" name="pw-confirm" placeholder="Confirm new password" minlength="6" required>
+                        </div>
+                        
+                        <button id="pw-btn" type="submit" class="btn-primary">Update Password</button>
+                    </form>
+                    
+                    <p id="pw-msg" class="form-message hidden" role="alert" aria-live="polite"></p>
+                </div>
+
+                <!-- Modern subscription card -->
+                <div class="account-card">
+                    <h3>
+                        Subscription
+                        <span id="premiumCrown" style="display: none; font-size: 1.25rem;">👑</span>
+                    </h3>
+                    <p id="subscriptionInfo">You are currently on the Free plan</p>
+                    <button id="upgradeBtn" class="btn-primary" style="margin-top: 1.5rem;">Upgrade to Premium</button>
+                </div>
+
+                <!-- Modern danger zone card -->
+                <div class="account-card danger-zone">
+                    <h3>Danger Zone</h3>
+                    <p>Once you delete your account, there is no going back. Please be certain.</p>
+                    <button id="deleteAccountBtn" class="btn-danger">Delete Account</button>
+                    <button id="logoutBtn" class="btn-secondary" style="margin-top: 1rem;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Added modern delete confirmation modal -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <div class="delete-modal-header">
+                <div class="delete-modal-icon">⚠️</div>
+                <h2 class="delete-modal-title">Delete Account</h2>
+            </div>
+            <div class="delete-modal-body">
+                <p>Are you absolutely sure you want to delete your account?</p>
+                <div class="delete-modal-warning">
+                    ⚠️ This action cannot be undone. All your data, analyses, and account information will be permanently deleted.
+                </div>
+            </div>
+            <div class="delete-modal-actions">
+                <button class="delete-modal-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button class="delete-modal-confirm" id="confirmDeleteBtn">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initAuth, requireAuth, getAuthState } from './lib/auth-store.js'
+        import { initHeader } from './lib/header-component.js'
+        import { 
+            getCurrentUser,
+            getTotalAnalysesCount,
+            getTodayAnalysesCount,
+            updateDisplayName,
+            updatePassword,
+            signOut,
+            deleteAccount,
+            getSupabaseClient
+        } from './lib/supabase.js'
+
+        function showToast(type, message) {
+            const existingToast = document.querySelector('.toast')
+            if (existingToast) {
+                existingToast.remove()
+            }
+            
+            const toast = document.createElement('div')
+            toast.className = `toast ${type}`
+            
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'
+            toast.innerHTML = `
+                <span style="font-size: 1.5rem; font-weight: bold;">${icon}</span>
+                <span>${message}</span>
+            `
+            
+            document.body.appendChild(toast)
+            
+            setTimeout(() => {
+                toast.classList.add('hiding')
+                setTimeout(() => toast.remove(), 300)
+            }, 5000)
+        }
+
+        function setButtonLoading(button, loading) {
+            if (loading) {
+                button.classList.add('btn-loading')
+                button.disabled = true
+            } else {
+                button.classList.remove('btn-loading')
+                button.disabled = false
+            }
+        }
+
+        const loadingSkeleton = document.getElementById('loadingSkeleton')
+        const accountContent = document.getElementById('accountContent')
+        loadingSkeleton.style.display = 'block'
+
+        await initAuth()
+        initHeader()
+
+        if (!requireAuth('/signup.html')) {
+            throw new Error('Authentication required')
+        }
+
+        loadingSkeleton.style.display = 'none'
+        accountContent.style.display = 'block'
+
+        async function loadUserData() {
+            const user = await getCurrentUser()
+            
+            if (!user) {
+                window.location.href = 'login.html'
+                return
+            }
+
+            document.getElementById('displayName').textContent = user.username || 'User'
+            document.getElementById('userEmail').textContent = user.email
+            
+            const totalCount = await getTotalAnalysesCount(user.id)
+            const todayCount = await getTodayAnalysesCount(user.id)
+            
+            document.getElementById('totalAnalyses').textContent = totalCount
+            document.getElementById('analysesToday').textContent = todayCount
+            
+            const subscriptionBadge = document.getElementById('subscriptionBadge')
+            const subscriptionInfo = document.getElementById('subscriptionInfo')
+            const upgradeBtn = document.getElementById('upgradeBtn')
+            const premiumCrown = document.getElementById('premiumCrown')
+            
+            if (user.is_premium) {
+                subscriptionBadge.textContent = 'Premium 👑'
+                subscriptionBadge.classList.add('premium')
+                subscriptionInfo.textContent = 'You are currently on the Premium plan with unlimited analyses'
+                upgradeBtn.style.display = 'none'
+                premiumCrown.style.display = 'inline'
+                document.getElementById('remainingAnalyses').textContent = '∞'
+            } else {
+                document.getElementById('remainingAnalyses').textContent = user.credits || 0
+            }
+        }
+
+        await loadUserData()
+
+        window.addEventListener('analysisCompleted', () => {
+            loadUserData()
+        })
+
+        const pwForm = document.getElementById('pw-form')
+        const pwBtn = document.getElementById('pw-btn')
+        const pwMsg = document.getElementById('pw-msg')
+        const pwNew = document.getElementById('pw-new')
+        const pwConfirm = document.getElementById('pw-confirm')
+
+        function showMsg(text, type = 'success') {
+            pwMsg.classList.remove('hidden', 'success', 'error')
+            pwMsg.classList.add(type)
+            pwMsg.textContent = text
+        }
+
+        pwForm.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            const newPw = pwNew.value.trim()
+            const confirmPw = pwConfirm.value.trim()
+
+            if (!newPw || !confirmPw) {
+                showMsg('Please fill in both fields.', 'error')
+                return
+            }
+            if (newPw.length < 6) {
+                showMsg('Password must be at least 6 characters.', 'error')
+                return
+            }
+            if (newPw !== confirmPw) {
+                showMsg('Passwords do not match.', 'error')
+                return
+            }
+
+            setButtonLoading(pwBtn, true)
+            try {
+                const supabase = getSupabaseClient()
+                const { data: s } = await supabase.auth.getSession()
+                if (!s?.session) {
+                    showMsg('Please log in again to update your password.', 'error')
+                    return
+                }
+
+                const { error } = await supabase.auth.updateUser({ password: newPw })
+                if (error) {
+                    const needReauth = error.status === 401 || /recent login|required|reauth/i.test(error.message || '')
+                    if (needReauth) {
+                        showMsg('For security, please log in again and retry.', 'error')
+                    } else {
+                        showMsg(error.message || 'Could not update password.', 'error')
+                    }
+                    return
+                }
+
+                pwNew.value = ''
+                pwConfirm.value = ''
+                showMsg('Password updated successfully.', 'success')
+                showToast('success', 'Password updated successfully!')
+            } catch {
+                showMsg('Unexpected error. Please try again.', 'error')
+            } finally {
+                setButtonLoading(pwBtn, false)
+            }
+        })
+
+        document.getElementById('updateProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault()
+            const newName = document.getElementById('newDisplayName').value.trim()
+            const button = document.getElementById('updateNameBtn')
+            
+            if (!newName) {
+                showToast('error', 'Please enter a display name')
+                return
+            }
+            
+            setButtonLoading(button, true)
+            
+            try {
+                const { error } = await updateDisplayName(newName)
+                
+                if (error) {
+                    showToast('error', error.message)
+                } else {
+                    showToast('success', 'Display name updated successfully!')
+                    await loadUserData()
+                    document.getElementById('newDisplayName').value = ''
+                }
+            } catch (error) {
+                showToast('error', 'Failed to update display name')
+            } finally {
+                setButtonLoading(button, false)
+            }
+        })
+
+        document.getElementById('upgradeBtn').addEventListener('click', () => {
+            window.location.href = 'pricing.html'
+        })
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            const button = document.getElementById('logoutBtn')
+            setButtonLoading(button, true)
+            
+            try {
+                await signOut()
+                showToast('success', 'Logged out successfully')
+                setTimeout(() => {
+                    window.location.href = 'index.html'
+                }, 500)
+            } catch (error) {
+                showToast('error', 'Failed to logout')
+                setButtonLoading(button, false)
+            }
+        })
+
+        const deleteModal = document.getElementById('deleteModal')
+        const deleteAccountBtn = document.getElementById('deleteAccountBtn')
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn')
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn')
+
+        deleteAccountBtn.addEventListener('click', () => {
+            deleteModal.classList.add('active')
+        })
+
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.classList.remove('active')
+        })
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            const button = confirmDeleteBtn
+            setButtonLoading(button, true)
+            
+            try {
+                const user = await getCurrentUser()
+                if (!user) {
+                    showToast('error', 'User not found')
+                    setButtonLoading(button, false)
+                    return
+                }
+                
+                await deleteAccount(user.id)
+                deleteModal.classList.remove('active')
+                showToast('success', 'Account deleted successfully')
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html'
+                }, 1500)
+            } catch (error) {
+                showToast('error', 'Failed to delete account. Please try again.')
+                setButtonLoading(button, false)
+            }
+        })
+
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                deleteModal.classList.remove('active')
+            }
+        })
+    </script>
+
+    <!-- Dark mode toggle - must run after DOM is loaded -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeToggle = document.getElementById('darkModeToggle')
+            const mobileDarkModeToggle = document.getElementById('mobileDarkModeToggle')
+            const savedTheme = localStorage.getItem('theme')
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode')
+            }
+
+            function toggleTheme() {
+                document.body.classList.toggle('dark-mode')
+                const isDark = document.body.classList.contains('dark-mode')
+                localStorage.setItem('theme', isDark ? 'dark' : 'light')
+            }
+
+            if (darkModeToggle) {
+                darkModeToggle.addEventListener('click', toggleTheme)
+            }
+            
+            if (mobileDarkModeToggle) {
+                mobileDarkModeToggle.addEventListener('click', toggleTheme)
+            }
+
+            // Mobile menu toggle
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle')
+            const navMenu = document.querySelector('.nav-menu')
+
+            if (mobileMenuToggle && navMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active')
+                    mobileMenuToggle.classList.toggle('active')
+                })
+            }
+
+            const progressBar = document.getElementById('top-progress')
+            document.querySelectorAll('a[href^="index.html"], a[href^="analyze.html"], a[href^="login.html"], a[href^="signup.html"], a[href^="pricing.html"], a[href^="privacy.html"], a[href^="contact.html"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const href = link.getAttribute('href')
+                    if (href && !href.startsWith('#')) {
+                        progressBar.style.width = '70%'
+                        progressBar.classList.add('active')
+                    }
+                })
+            })
+        })
+    </script>
+
+    <!-- Added footer back to account.html -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>LynxFace</h3>
+                <p>Advanced AI-powered facial analysis technology</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="analyze.html">Analyze</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="privacy.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 LynxFace. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

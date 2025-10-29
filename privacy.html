@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - LynxFace</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <!-- Added Supabase library for authentication -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Added custom styles for modern privacy page design -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .privacy-hero {
+      background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #ddd6fe 100%);
+      padding: 4rem 1rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    body.dark-mode .privacy-hero {
+      background: linear-gradient(135deg, #1e293b 0%, #312e81 50%, #4c1d95 100%);
+    }
+    
+    .privacy-hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 20s ease-in-out infinite;
+    }
+    
+    .privacy-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -5%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+    
+    .privacy-content-wrapper {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 3rem 1rem;
+      position: relative;
+    }
+    
+    @media (max-width: 1024px) {
+      .privacy-content-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .privacy-toc {
+        position: static !important;
+        max-height: none !important;
+        margin-bottom: 2rem;
+      }
+    }
+    
+    .privacy-toc {
+      position: sticky;
+      top: 100px;
+      height: fit-content;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    body.dark-mode .privacy-toc {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+    
+    .privacy-toc h3 {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #8b5cf6;
+      margin-bottom: 1rem;
+    }
+    
+    .privacy-toc ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .privacy-toc li {
+      margin-bottom: 0.75rem;
+    }
+    
+    .privacy-toc a {
+      display: block;
+      font-size: 0.875rem;
+      color: #64748b;
+      text-decoration: none;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    
+    body.dark-mode .privacy-toc a {
+      color: #94a3b8;
+    }
+    
+    .privacy-toc a:hover,
+    .privacy-toc a.active {
+      background: rgba(139, 92, 246, 0.1);
+      color: #8b5cf6;
+      transform: translateX(4px);
+    }
+    
+    .privacy-section {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(139, 92, 246, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    body.dark-mode .privacy-section {
+      background: rgba(30, 41, 59, 0.7);
+      border-color: rgba(139, 92, 246, 0.2);
+    }
+    
+    .privacy-section:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .privacy-section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .privacy-section-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    .privacy-section-icon svg {
+      width: 24px;
+      height: 24px;
+      color: white;
+    }
+    
+    .privacy-section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0;
+    }
+    
+    body.dark-mode .privacy-section h2 {
+      color: #f1f5f9;
+    }
+    
+    .privacy-section p,
+    .privacy-section li {
+      color: #475569;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    
+    body.dark-mode .privacy-section p,
+    body.dark-mode .privacy-section li {
+      color: #cbd5e1;
+    }
+    
+    .privacy-section ul {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+    
+    .privacy-section li {
+      margin-bottom: 0.75rem;
+    }
+    
+    .privacy-section strong {
+      color: #8b5cf6;
+      font-weight: 600;
+    }
+    
+    .privacy-section a {
+      color: #8b5cf6;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    
+    .privacy-section a:hover {
+      border-bottom-color: #8b5cf6;
+    }
+    
+    .privacy-highlight {
+      background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+      border-left: 4px solid #3b82f6;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+    
+    body.dark-mode .privacy-highlight {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+      border-left-color: #6366f1;
+    }
+    
+    .privacy-highlight-icon {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .privacy-highlight-icon svg {
+      width: 24px;
+      height: 24px;
+      color: #3b82f6;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    
+    body.dark-mode .privacy-highlight-icon svg {
+      color: #60a5fa;
+    }
+    
+    .privacy-highlight h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1e40af;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    body.dark-mode .privacy-highlight h3 {
+      color: #93c5fd;
+    }
+    
+    .privacy-highlight p {
+      color: #1e40af;
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    
+    body.dark-mode .privacy-highlight p {
+      color: #bfdbfe;
+    }
+    
+    .last-updated {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: #64748b;
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    body.dark-mode .last-updated {
+      background: rgba(30, 41, 59, 0.9);
+      color: #94a3b8;
+    }
+    
+    .last-updated strong {
+      color: #8b5cf6;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .last-updated {
+        position: static;
+        display: inline-block;
+        margin-bottom: 1rem;
+      }
+      
+      .privacy-section {
+        padding: 1.5rem;
+      }
+      
+      .privacy-section h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-progress-bar" id="top-progress"></div>
+  
+  <!-- Updated navbar to match index.html structure -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+          <img src="favicon.png" alt="LynxFace Logo" class="nav-logo">
+          <span class="nav-brand">LynxFace</span>
+        </a>
+      </div>
+      <button class="mobile-menu-toggle" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="analyze.html">Analyze</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="privacy.html" class="active">Privacy</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <div class="mobile-auth-buttons"></div>
+        <div class="mobile-dark-mode-toggle">
+          <button id="mobileDarkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+      </ul>
+      <div class="nav-right" id="navRight">
+        <div class="account-skeleton" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; justify-content: flex-end;">
+          <div class="skeleton" style="width: 120px; height: 36px; border-radius: 9999px; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+          <div class="skeleton" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+          <div class="skeleton" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Redesigned main content with modern SaaS aesthetic -->
+  <main class="fade-enter">
+    <!-- Hero Section -->
+    <div class="privacy-hero">
+      <div class="max-w-4xl mx-auto text-center" style="position: relative; z-index: 1;">
+        <h1 style="font-size: 3rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, #1e293b 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Privacy Policy</h1>
+        <p style="font-size: 1.25rem; color: #64748b; max-width: 600px; margin: 0 auto;">Your data privacy and trust mean everything to us.</p>
+      </div>
+    </div>
+
+    <!-- Content Wrapper with TOC -->
+    <div class="privacy-content-wrapper">
+      <!-- Table of Contents -->
+      <aside class="privacy-toc">
+        <h3>Contents</h3>
+        <ul>
+          <li><a href="#section-1" class="toc-link">Information We Collect</a></li>
+          <li><a href="#section-2" class="toc-link">How We Use Your Data</a></li>
+          <li><a href="#section-3" class="toc-link">Data Storage & Security</a></li>
+          <li><a href="#section-4" class="toc-link">Third-Party Services</a></li>
+          <li><a href="#section-5" class="toc-link">Cookies & Tracking</a></li>
+          <li><a href="#section-6" class="toc-link">Your Rights & Choices</a></li>
+          <li><a href="#section-7" class="toc-link">Children's Privacy</a></li>
+          <li><a href="#section-8" class="toc-link">Policy Changes</a></li>
+          <li><a href="#section-9" class="toc-link">Contact Us</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <div style="position: relative;">
+        <div class="last-updated">
+          <strong>Last Updated:</strong> January 2025
+        </div>
+
+        <!-- Privacy Highlight Banner -->
+        <div class="privacy-highlight" style="margin-top: 3rem;">
+          <div class="privacy-highlight-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+            <div>
+              <h3>Your Privacy is Protected</h3>
+              <p>All face analysis happens locally in your browser. Your photos never leave your device and are never uploaded to any server.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 1 -->
+        <section id="section-1" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h2>Information We Collect</h2>
+          </div>
+          <p>LynxFace is designed with privacy as a core principle. We collect minimal information:</p>
+          <ul>
+            <li><strong>No Photo Storage:</strong> Photos you upload for analysis are processed entirely in your browser using client-side JavaScript and are never transmitted to our servers.</li>
+            <li><strong>Contact Form Data:</strong> When you submit the contact form, we collect your name, email address, and message through Formspree, a third-party service.</li>
+            <li><strong>Analytics:</strong> We may use basic analytics to understand how visitors use our site (page views, browser type, etc.) but do not track individual users.</li>
+          </ul>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="section-2" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <h2>How We Use Your Data</h2>
+          </div>
+          <p>The limited information we collect is used solely for:</p>
+          <ul>
+            <li><strong>Face Analysis:</strong> All facial analysis is performed locally on your device using MediaPipe technology. No data is sent to external servers.</li>
+            <li><strong>Communication:</strong> Contact form submissions are used only to respond to your inquiries.</li>
+            <li><strong>Service Improvement:</strong> Anonymous usage statistics help us improve the website experience.</li>
+          </ul>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="section-3" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+            </div>
+            <h2>Data Storage & Security</h2>
+          </div>
+          <ul>
+            <li><strong>Local Processing:</strong> All face analysis happens in your browser. Photos are temporarily loaded into memory and discarded when you close the page or reset the analysis.</li>
+            <li><strong>No Server Storage:</strong> We do not store, save, or have access to any photos you analyze.</li>
+            <li><strong>Third-Party Services:</strong> Contact form data is handled by Formspree, which has its own privacy policy. We recommend reviewing their terms.</li>
+          </ul>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="section-4" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+              </svg>
+            </div>
+            <h2>Third-Party Services</h2>
+          </div>
+          <p>LynxFace uses the following third-party services:</p>
+          <ul>
+            <li><strong>MediaPipe (Google):</strong> Face landmark detection runs entirely in your browser. No data is sent to Google servers.</li>
+            <li><strong>Formspree:</strong> Contact form submissions are processed through Formspree. See their privacy policy at <a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener">formspree.io/legal/privacy-policy</a>.</li>
+            <li><strong>Tailwind CSS CDN:</strong> We load styling from a CDN for faster page loads.</li>
+          </ul>
+        </section>
+
+        <!-- Section 5 -->
+        <section id="section-5" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h2>Cookies & Tracking</h2>
+          </div>
+          <p>LynxFace does not use cookies for tracking purposes. Any cookies used are strictly functional (e.g., session management) and do not track your personal information.</p>
+        </section>
+
+        <!-- Section 6 -->
+        <section id="section-6" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+            </div>
+            <h2>Your Rights & Choices</h2>
+          </div>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Use LynxFace without providing any personal information (except when contacting us)</li>
+            <li>Request deletion of any contact form data we may have stored</li>
+            <li>Ask questions about our privacy practices</li>
+          </ul>
+        </section>
+
+        <!-- Section 7 -->
+        <section id="section-7" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h2>Children's Privacy</h2>
+          </div>
+          <p>LynxFace is not intended for children under 13 years of age. We do not knowingly collect personal information from children.</p>
+        </section>
+
+        <!-- Section 8 -->
+        <section id="section-8" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+            </div>
+            <h2>Changes to This Policy</h2>
+          </div>
+          <p>We may update this privacy policy from time to time. Any changes will be posted on this page with an updated revision date.</p>
+        </section>
+
+        <!-- Section 9 -->
+        <section id="section-9" class="privacy-section">
+          <div class="privacy-section-header">
+            <div class="privacy-section-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <h2>Contact Us</h2>
+          </div>
+          <p>If you have any questions about this privacy policy or our practices, please contact us through our <a href="contact.html">contact form</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>LynxFace</h3>
+        <p>Advanced AI-powered facial analysis technology for everyone.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="analyze.html">Analyze</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="privacy.html">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 LynxFace. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script type="module">
+    import { initAuth } from './lib/auth-store.js'
+    import { initHeader } from './lib/header-component.js'
+    
+    await initAuth()
+    initHeader()
+    
+    document.querySelectorAll('.toc-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault()
+        const targetId = link.getAttribute('href')
+        const targetSection = document.querySelector(targetId)
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          
+          // Update active state
+          document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'))
+          link.classList.add('active')
+        }
+      })
+    })
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: 0
+    }
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id')
+          document.querySelectorAll('.toc-link').forEach(link => {
+            link.classList.remove('active')
+            if (link.getAttribute('href') === `#${id}`) {
+              link.classList.add('active')
+            }
+          })
+        }
+      })
+    }, observerOptions)
+    
+    document.querySelectorAll('.privacy-section').forEach(section => {
+      observer.observe(section)
+    })
+  </script>
+</body>
+</html>

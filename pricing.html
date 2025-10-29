@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - LynxFace</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Added Gumroad script for overlay functionality -->
+    <script src="https://gumroad.com/js/gumroad.js"></script>
+    <!-- Added custom styles for pricing card hover animations -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Pricing card hover animation styles */
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .pricing-card-premium {
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card-premium:hover {
+            transform: scale(1.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Updated FAQ accordion styles to match reference image - individual cards with shadows */
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        body.dark-mode .faq-item {
+            background: #1f2937;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .faq-item:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .faq-question {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .faq-question:hover h3 {
+            color: #06b6d4;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 24px;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 24px 24px 24px;
+        }
+
+        .faq-chevron {
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 16px;
+        }
+
+        .faq-item.active .faq-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Added styles for processing badge and success toast */
+        .processing-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .processing-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 3rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 10001;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* Added styles for embed modal fallback */
+        .gumroad-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .gumroad-modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+        }
+
+        .gumroad-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .gumroad-modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        /* Added plan badge styles */
+        .plan-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .plan-badge-free {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .plan-badge-premium {
+            background: linear-gradient(135deg, #0891b2 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .plan-badge-elite {
+            background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-progress-bar" id="top-progress"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <a href="index.html" style="display: flex; align-items: center; text-decoration: none; color: inherit;">
+                    <img src="favicon.png" alt="LynxFace Logo" class="nav-logo">
+                    <span class="nav-brand">LynxFace</span>
+                </a>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="analyze.html">Analyze</a></li>
+                <li><a href="pricing.html" class="active">Pricing</a></li>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <div class="mobile-auth-buttons">
+                </div>
+                <div class="mobile-dark-mode-toggle">
+                    <button id="mobileDarkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">
+                        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <line x1="12" y1="1" x2="12" y2="3"></line>
+                            <line x1="12" y1="21" x2="12" y2="23"></line>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                            <line x1="1" y1="12" x2="3" y2="12"></line>
+                            <line x1="21" y1="12" x2="23" y2="12"></line>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                        </svg>
+                        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </ul>
+            <div class="nav-right" id="navRight">
+                <div class="account-skeleton" style="display: flex; align-items: center; gap: 0.75rem; width: 100%; justify-content: flex-end;">
+                    <div class="skeleton" style="width: 120px; height: 36px; border-radius: 9999px; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+                    <div class="skeleton" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+                    <div class="skeleton" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite;"></div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Replaced entire pricing section with modern 3-card layout matching index.html -->
+    <main class="fade-enter">
+        <!-- Pricing Section - matching index.html design exactly -->
+        <section class="py-20 bg-gray-50 dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">Simple, Transparent Pricing</h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                        Choose the plan that's right for you. Start with our free tier or upgrade for premium or elite tier.
+                    </p>
+                    <!-- Added current plan display -->
+                    <div id="currentPlanDisplay" class="mt-4"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    
+                    <!-- Free Plan Card with hover animation -->
+                    <div class="pricing-card bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Free</h3>
+                        <div class="mb-6">
+                            <span class="text-5xl font-bold text-gray-900 dark:text-white">$0</span>
+                            <span class="text-gray-600 dark:text-gray-400">/month</span>
+                        </div>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">3 analyses credits</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">Basic metrics</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">100% private</span>
+                            </li>
+                        </ul>
+                        <a href="analyze.html" class="block w-full text-center bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold px-6 py-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                            Get Started
+                        </a>
+                    </div>
+
+                    <!-- Updated Premium button with data-gumroad-overlay-checkout for proper overlay popup -->
+                    <div class="pricing-card-premium bg-gradient-to-br from-cyan-600 to-indigo-600 rounded-2xl p-8 shadow-2xl transform scale-105 relative">
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <span class="bg-yellow-500 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">POPULAR</span>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                            <span style="font-size: 1.5rem;">👑</span>
+                            Premium
+                        </h3>
+                        <div class="mb-6">
+                            <span class="text-5xl font-bold text-white">$9</span>
+                            <span class="text-white/80">/month</span>
+                        </div>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-white">100 analyses credits</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-white">All metrics & insights</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-white">Detailed reports</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-white">Priority support</span>
+                            </li>
+                        </ul>
+                        <a href="https://lynxface.gumroad.com/l/premium" id="premiumBtn" class="gumroad-button block w-full text-center bg-white text-indigo-600 font-semibold px-6 py-3 rounded-xl hover:bg-gray-100 transition-all" data-gumroad-overlay-checkout="true">
+                            Upgrade Now
+                        </a>
+                    </div>
+
+                    <!-- Updated Elite button with data-gumroad-overlay-checkout for proper overlay popup -->
+                    <div class="pricing-card bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                            <span style="font-size: 1.5rem;">⭐</span>
+                            Elite
+                        </h3>
+                        <div class="mb-6">
+                            <span class="text-5xl font-bold text-gray-900 dark:text-white">$19.99</span>
+                            <span class="text-gray-600 dark:text-gray-400">/month</span>
+                        </div>
+                        <ul class="space-y-4 mb-8">
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">500 analyses credits</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">All metrics & insights</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">Detailed reports</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300">Priority support</span>
+                            </li>
+                        </ul>
+                        <a href="https://lynxface.gumroad.com/l/elite" id="eliteBtn" class="gumroad-button block w-full text-center bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold px-6 py-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all" data-gumroad-overlay-checkout="true">
+                            Upgrade Now
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Redesigned FAQ section to match reference image with individual card design -->
+        <section class="py-20 bg-gray-50 dark:bg-gray-800">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">Frequently asked questions</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">What are credits?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Credits are the currency used on LynxFace. Each credit allows you to analyze one face image with our AI-powered tools. You can use credits to get detailed facial analysis, beauty scores, and other professional insights.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">What's the difference between a subscription and Pay-as-you-go credits?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Subscriptions provide you with a monthly allocation of credits at a discounted rate, perfect for regular users. Pay-as-you-go credits are purchased individually and never expire, ideal for occasional use. Subscription credits reset each month, while pay-as-you-go credits remain in your account indefinitely.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Can I cancel my subscription at any time?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Yes, you can cancel your subscription at any time from your account settings. Your subscription will remain active until the end of your current billing period, and you'll continue to have access to your credits until then. No cancellation fees apply.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Can I upgrade or downgrade my subscription?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">You can upgrade or downgrade your subscription plan at any time. When upgrading, you'll be charged a prorated amount for the remainder of your billing cycle. When downgrading, the change will take effect at the start of your next billing period.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">What if I don't use all my subscription credits?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">Subscription credits reset at the beginning of each billing cycle and don't roll over. However, any pay-as-you-go credits you purchase separately will never expire and remain in your account indefinitely. We recommend choosing a plan that matches your typical monthly usage.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFaq(this)">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">What happens if I run out of credits?</h3>
+                            <svg class="faq-chevron w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">If you run out of credits, you can either wait until your subscription renews (if you have a subscription plan) or purchase additional pay-as-you-go credits immediately. You can also upgrade to a higher-tier subscription plan for more monthly credits at any time.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>LynxFace</h3>
+                <p>Advanced AI-powered facial analysis technology</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="analyze.html">Analyze</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="privacy.html">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 LynxFace. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import { initAuth } from './lib/auth-store.js'
+        import { initHeader } from './lib/header-component.js'
+        import { getCurrentUser, getSupabaseClient } from './lib/supabase.js'
+
+        await initAuth()
+        initHeader()
+
+        async function initGumroadButtons() {
+            const user = await getCurrentUser()
+            
+            const premiumBtn = document.getElementById('premiumBtn')
+            const eliteBtn = document.getElementById('eliteBtn')
+            const currentPlanDisplay = document.getElementById('currentPlanDisplay')
+            
+            const returnUrl = window.location.origin + '/payment-success.html'
+            
+            if (user && user.id) {
+                console.log('[v0] Setting up Gumroad buttons for user:', user.id)
+                
+                const planBadgeClass = user.plan === 'premium' ? 'plan-badge-premium' : user.plan === 'elite' ? 'plan-badge-elite' : 'plan-badge-free'
+                currentPlanDisplay.innerHTML = `
+                    <div class="flex items-center justify-center gap-3">
+                        <span class="plan-badge ${planBadgeClass}">${user.plan || 'free'}</span>
+                        <span class="text-gray-600 dark:text-gray-400">•</span>
+                        <span class="text-gray-700 dark:text-gray-300 font-medium">${user.credits || 0} credits</span>
+                    </div>
+                `
+                
+                premiumBtn.href = `https://lynxface.gumroad.com/l/premium?wanted=true&prefill_UserID=${user.id}`
+                eliteBtn.href = `https://lynxface.gumroad.com/l/elite?wanted=true&prefill_UserID=${user.id}`
+                
+                console.log('[v0] Premium URL:', premiumBtn.href)
+                console.log('[v0] Elite URL:', eliteBtn.href)
+                console.log('[v0] Return URL (configure in Gumroad):', returnUrl)
+                
+            } else {
+                console.log('[v0] User not logged in, disabling buttons')
+                currentPlanDisplay.innerHTML = `
+                    <div class="text-yellow-600 dark:text-yellow-400 font-medium">
+                        ⚠️ Please log in first
+                    </div>
+                `
+                
+                premiumBtn.classList.add('opacity-50', 'cursor-not-allowed')
+                eliteBtn.classList.add('opacity-50', 'cursor-not-allowed')
+                premiumBtn.removeAttribute('data-gumroad-overlay-checkout')
+                eliteBtn.removeAttribute('data-gumroad-overlay-checkout')
+                premiumBtn.removeAttribute('href')
+                eliteBtn.removeAttribute('href')
+                
+                premiumBtn.addEventListener('click', (e) => {
+                    e.preventDefault()
+                    alert('Please log in first')
+                    window.location.href = 'login.html'
+                })
+                eliteBtn.addEventListener('click', (e) => {
+                    e.preventDefault()
+                    alert('Please log in first')
+                    window.location.href = 'login.html'
+                })
+            }
+        }
+
+        console.log('[v0] Initializing Gumroad integration')
+        initGumroadButtons()
+
+        window.toggleFaq = function(element) {
+            const faqItem = element.closest('.faq-item');
+            const allItems = document.querySelectorAll('.faq-item');
+            
+            allItems.forEach(item => {
+                if (item !== faqItem) {
+                    item.classList.remove('active');
+                }
+            });
+            
+            faqItem.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

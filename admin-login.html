@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - LynxFace</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --color-primary: #0891b2;
+      --color-primary-dark: #0e7490;
+      --color-secondary: #4f46e5;
+      --color-bg: #ffffff;
+      --color-surface: #f8fafc;
+      --color-border: #e2e8f0;
+      --color-text: #0f172a;
+      --color-text-muted: #64748b;
+      --color-error: #ef4444;
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --radius: 0.5rem;
+    }
+
+    body.dark-mode {
+      --color-bg: #0f172a;
+      --color-surface: #1e293b;
+      --color-border: #334155;
+      --color-text: #f1f5f9;
+      --color-text-muted: #94a3b8;
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      color: var(--color-text);
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    body.dark-mode {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 28rem;
+    }
+
+    .login-card {
+      background-color: var(--color-bg);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1rem;
+      border-radius: 0.75rem;
+    }
+
+    .login-header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: var(--color-text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: 1rem;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      transition: all 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .dark-mode-toggle {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dark-mode-toggle:hover {
+      transform: scale(1.05);
+    }
+
+    .dark-mode-toggle svg {
+      color: var(--color-text);
+    }
+
+    body.dark-mode .sun-icon {
+      display: none;
+    }
+
+    body.dark-mode .moon-icon {
+      display: block !important;
+    }
+
+    .moon-icon {
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background-color: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1rem 1.5rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--color-error);
+    }
+
+    .toast.success {
+      border-left: 4px solid #10b981;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .spinner {
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+  </button>
+
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <img src="favicon.png" alt="LynxFace Logo" class="login-logo">
+        <h1>Admin Login</h1>
+        <p>Sign in to access the admin panel</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-primary" id="loginBtn">
+          <span id="btnText">Sign In</span>
+          <div class="spinner" id="btnSpinner" style="display: none; margin: 0 auto;"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle')
+    const body = document.body
+    
+    // Load theme preference
+    const savedTheme = localStorage.getItem('admin_theme')
+    if (savedTheme === 'dark') {
+      body.classList.add('dark-mode')
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+      body.classList.toggle('dark-mode')
+      localStorage.setItem('admin_theme', body.classList.contains('dark-mode') ? 'dark' : 'light')
+    })
+
+    // Toast notification
+    function showToast(message, type = 'error') {
+      const toast = document.createElement('div')
+      toast.className = `toast ${type}`
+      toast.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          ${type === 'error' 
+            ? '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'
+            : '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>'
+          }
+        </svg>
+        <span>${message}</span>
+      `
+      document.body.appendChild(toast)
+      
+      setTimeout(() => {
+        toast.remove()
+      }, 3000)
+    }
+
+    // Login form handler
+    const loginForm = document.getElementById('loginForm')
+    const loginBtn = document.getElementById('loginBtn')
+    const btnText = document.getElementById('btnText')
+    const btnSpinner = document.getElementById('btnSpinner')
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      
+      const email = document.getElementById('email').value
+      const password = document.getElementById('password').value
+
+      // Show loading state
+      loginBtn.disabled = true
+      btnText.style.display = 'none'
+      btnSpinner.style.display = 'block'
+
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 800))
+
+      // Mock authentication
+      if (email === 'admin@lynxface.ai' && password === 'admin123') {
+        localStorage.setItem('admin_token', 'ok')
+        showToast('Login successful! Redirecting...', 'success')
+        setTimeout(() => {
+          window.location.href = '/admin/index.html'
+        }, 1000)
+      } else {
+        showToast('Invalid email or password. Please try again.')
+        loginBtn.disabled = false
+        btnText.style.display = 'block'
+        btnSpinner.style.display = 'none'
+      }
+    })
+  </script>
+</body>
+</html>
